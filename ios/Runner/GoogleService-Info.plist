@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>482374606772-o6hj0osnsc2sccr9gl7v8sslq2qchrtg.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.482374606772-o6hj0osnsc2sccr9gl7v8sslq2qchrtg</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>482374606772-h4km2dl5nqc5nr5uh9f6l5qo78hchvad.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDhbt8OquPcmhc07ckwLOHAYFdsz2CSxxs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>482374606772</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.habibsapplication.app.testProject</string>
+	<key>PROJECT_ID</key>
+	<string>alusoft-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>alusoft-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:482374606772:ios:df8ae76dce98ea46f7dce1</string>
+	<key>DATABASE_URL</key>
+	<string>https://alusoft-app-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
