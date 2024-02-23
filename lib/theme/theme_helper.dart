@@ -94,7 +94,7 @@ class TextThemes {
         ),
         headlineMedium: TextStyle(
           color: appTheme.lightBlue700,
-          fontSize: 26.fSize,
+          fontSize: 18.fSize,
           fontFamily: 'Montserrat Subrayada',
           fontWeight: FontWeight.w400,
         ),

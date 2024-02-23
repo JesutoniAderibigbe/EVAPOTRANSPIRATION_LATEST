@@ -4,6 +4,7 @@ import 'package:habib_s_application5/widgets/app_bar/appbar_leading_image.dart';
 import 'package:habib_s_application5/widgets/app_bar/appbar_title.dart';
 import 'package:habib_s_application5/widgets/app_bar/appbar_trailing_image.dart';
 import 'package:habib_s_application5/widgets/app_bar/custom_app_bar.dart';
+import 'package:intl/intl.dart';
 
 class HistoryDetailsScreen extends StatelessWidget {
   const HistoryDetailsScreen({Key? key}) : super(key: key);
@@ -50,14 +51,14 @@ class HistoryDetailsScreen extends StatelessWidget {
                       Text("University Of Ibadan, Ibadan.",
                           style: theme.textTheme.titleMedium),
                       SizedBox(height: 11.v),
-                      Container(
-                          width: 304.h,
-                          margin: EdgeInsets.only(right: 64.h),
-                          child: Text(
-                              "Evaporation - 16%, Transpiration - 25%\n;ajknfprg ;erjklnpoer ;elrkjnneb ;wekjrbvjwer ;ekjrv",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.labelLarge)),
+                      // Container(
+                      //     width: 304.h,
+                      //     margin: EdgeInsets.only(right: 64.h),
+                      //     child: Text(
+                      //         "Evaporation - 16%, Transpiration - 25%\n;ajknfprg ;erjklnpoer ;elrkjnneb ;wekjrbvjwer ;ekjrv",
+                      //         maxLines: 2,
+                      //         overflow: TextOverflow.ellipsis,
+                      //         style: theme.textTheme.labelLarge)),
                       SizedBox(height: 35.v),
                       SizedBox(
                           height: 478.v,
@@ -262,6 +263,7 @@ class HistoryDetailsScreen extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
         leadingWidth: 60.h,
+        
         leading: AppbarLeadingImage(
             imagePath: ImageConstant.imgPolygon4,
             margin: EdgeInsets.only(left: 30.h, top: 18.v, bottom: 17.v)),
@@ -276,12 +278,19 @@ class HistoryDetailsScreen extends StatelessWidget {
   }
 
   /// Section Widget
-  Widget _buildTwenty(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text("Yesterday, 05-06-2022", style: theme.textTheme.bodySmall),
-      Text("08:00 AM", style: theme.textTheme.bodySmall)
-    ]);
-  }
+ Widget _buildTwenty(BuildContext context) {
+  DateTime now = DateTime.now();
+  String formattedDate = DateFormat.yMMMd().format(now);
+  String formattedTime = DateFormat.jm().format(now);
+
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text("Today, $formattedDate", style: theme.textTheme.bodySmall),
+      Text(formattedTime, style: theme.textTheme.bodySmall),
+    ],
+  );
+}
 
   /// Navigates back to the previous screen.
   onTapImgArrowLeft(BuildContext context) {

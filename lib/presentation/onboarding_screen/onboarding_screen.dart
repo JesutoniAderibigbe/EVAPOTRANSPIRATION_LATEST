@@ -36,6 +36,11 @@ class OnboardingScreen extends StatelessWidget {
               CustomElevatedButton(
                 width: 209.h,
                 text: "Get Started",
+                onPressed: () {
+                 
+                  Navigator.pushNamed(
+                      context, AppRoutes.manualCalculationScreen);
+                },
               ),
             ],
           ),
