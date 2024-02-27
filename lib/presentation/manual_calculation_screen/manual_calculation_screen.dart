@@ -9,6 +9,7 @@ import 'package:habib_s_application5/widgets/app_bar/appbar_leading_image.dart';
 import 'package:habib_s_application5/widgets/app_bar/appbar_title.dart';
 import 'package:habib_s_application5/widgets/app_bar/appbar_trailing_image.dart';
 import 'package:habib_s_application5/widgets/app_bar/custom_app_bar.dart';
+import 'package:habib_s_application5/widgets/customAlerDialog.dart';
 import 'package:habib_s_application5/widgets/custom_elevated_button.dart';
 import 'package:habib_s_application5/widgets/custom_text_form_field.dart';
 
@@ -38,37 +39,60 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
   TextEditingController resultController = TextEditingController();
   TextEditingController meanAirTemperature = TextEditingController();
 
-  WeatherData? _weatherData;
+  WeatherData? weatherData;
 
   Future<void> _fetchWeatherData(String cityName) async {
     try {
-      WeatherData weatherData = await fetchWeatherData(cityName);
-      if (!mounted)
-        return; // Check if the widget is mounted before calling setState
-      setState(() {
-        _weatherData = weatherData;
-        airTemperatureController.text = weatherData.main.temp.toString();
-        windSpeedController.text = weatherData.wind.speed.toString();
-        psychrometricConstantController.text = '0.067';
-        slopeOfVaporPressureCurveController.text =
-            //"34567";
-            slopeVapourPressureCurve(weatherData.main.temp).toString();
-        actualVaporPressureController.text =
-            //"1234";
+      WeatherData weatherData = await fetchWeatherData(7.3611, 3.868);
+      print("hey");
+      print(weatherData);
+      print(weatherData.main!.temp);
+      print(weatherData.wind!.speed);
+      print(weatherData.main!.humidity);
+      print(weatherData.main!.pressure);
 
-            actualVapourPressure(
-                    weatherData.main.temp, weatherData.main.humidity)
-                .toString();
+      // var temperature =
+      //     convertToDegreeCelcius(weatherData.main!.temp!);
+
+      setState(() {
+        weatherData = weatherData;
+//convert airtempertaure to celsius
+
+        //   print("Temperature: $temperature");
+        print("Wind Speed: ${weatherData.wind!.speed}");
+        print(
+            "slopeOfVaporPressureCurve: ${slopeVapourPressureCurve(weatherData.main!.temp!)}");
+
+        // Set text controller values
+
+        //convertairtemperaturefrom kelvin to celsius
+
+        var airTempertaure = convertToDegreeCelcius(weatherData.main!.temp!);
+
+        airTemperatureController.text = airTempertaure.toString();
+
+        windSpeedController.text = weatherData.wind!.speed.toString();
+
+        psychrometricConstantController.text = '0.067';
+
+        slopeOfVaporPressureCurveController.text =
+            slopeVapourPressureCurve(weatherData.main!.temp!).toString();
+
+        actualVaporPressureController.text = actualVapourPressure(
+                weatherData.main!.temp!, weatherData.main!.humidity!)
+            .toString();
+
         saturationVaporPressureController.text =
-            saturationVaporPressure(weatherData.main.temp).toString();
+            saturationVaporPressure(weatherData.main!.temp!).toString();
+
         soilHeatFluxController.text = '0';
-        meanAirTemperature.text = "1234";
-        //meanAirTemperatureCalculation();
-        netRadiationController.text = "1";
-        // Set other text controller values if needed
+
+        meanAirTemperature.text = meanAirTemperatureCalculation(
+                weatherData.main!.tempMax!, weatherData.main!.tempMin!)
+            .toString();
+
+        netRadiationController.text = "10";
       });
-      print('Latitude new: ${_weatherData?.coord.lat}');
-      print('Longitude new: ${_weatherData?.coord.lon}');
     } catch (e) {
       print('Error fetching weather data: $e');
     }
@@ -85,8 +109,10 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
     psychrometricConstant,
   ) {
     double vaporPressureDeficit = saturationVaporPressure - actualVaporPressure;
+
     double numerator = slopeVaporPressureCurve * netRadiation +
         psychrometricConstant * (vaporPressureDeficit * windSpeed);
+
     double denominator = slopeVaporPressureCurve +
         ((psychrometricConstant * 1.6) * vaporPressureDeficit);
 
@@ -99,7 +125,7 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
             soilHeatFlux)) /
         (psychrometricConstant * (1 + 0.34 * windSpeed));
 
-    print(eto);
+    print("Eto: $eto");
 
     return eto;
   }
@@ -110,24 +136,41 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
   }
 
   slopeVapourPressureCurve(double temperature) {
+    double temperatureCelsius = temperature - 273.15;
     return 4098 *
-        (0.6108 * exp((17.27 * temperature) / (temperature + 237.3))) /
+        (0.6108 *
+            exp((17.27 * temperatureCelsius) / (temperatureCelsius + 237.3))) /
         pow(temperature + 237.3, 2);
   }
 
-  actualVapourPressure(double temperature, int relativeHumidity) {
-    return (0.6108 * exp((17.27 * temperature) / (temperature + 237.3))) *
+  double actualVapourPressure(
+      double temperatureFahrenheit, int relativeHumidity) {
+    // Convert temperature from Kelvin to Celsius
+    double temperatureCelsius = temperatureFahrenheit - 273.15;
+
+    return (0.6108 *
+            exp((17.27 * temperatureCelsius) / (temperatureCelsius + 237.3))) *
         (relativeHumidity / 100);
   }
 
-  saturationVaporPressure(temperature) {
-    return 0.6108 * exp((17.27 * temperature) / (temperature + 237.3));
+  double saturationVaporPressure(double temperatureFahrenheit) {
+    // Convert temperature to Celsius
+    double temperatureCelsius = temperatureFahrenheit - 273.15;
+
+    return 0.6108 *
+        exp((17.27 * temperatureCelsius) / (temperatureCelsius + 237.3));
   }
 
-  meanAirTemperatureCalculation() {
-    return (double.parse(airTemperatureController.text) +
-            double.parse(meanAirTemperature.text)) /
-        2;
+  double meanAirTemperatureCalculation(
+      double airTemperature, double meanTemperature) {
+    // double airTemperatures = double.parse(airTemperature);
+    // double meanTemperature = double.parse(meanAirTemperature.text);
+
+    // Convert temperatures to Celsius
+    double airTemperatureCelsius = airTemperature - 273.15;
+    double meanTemperatureCelsius = meanTemperature - 273.15;
+
+    return (airTemperatureCelsius + meanTemperatureCelsius) / 2;
   }
 
   // netRadiationCalculation() {
@@ -137,7 +180,10 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
   @override
   void initState() {
     super.initState();
-    fetchWeatherData("University of Ibadan");
+    print("Latitude: ${weatherData?.coord!.lat}");
+    //  print("Latitude: ${weatherData.lat}");
+    _fetchWeatherData("ibadan");
+    // print('Latitude: ${_weatherData?.main.tempMax}');
   }
 
   @override
@@ -150,80 +196,103 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: _buildAppBar(context),
-          body: FutureBuilder(
-              future: _fetchWeatherData("Ibadan"),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container(
-                      width: double.maxFinite,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 30.h,
-                        vertical: 31.v,
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildDegreesCounter(context),
-                            SizedBox(height: 31.v),
-                            _buildMinimumTemperature1(context),
-                            SizedBox(height: 31.v),
-                            _buildSolarRadiation(context),
-                            SizedBox(height: 31.v),
-                            _buildMinimumTemperature2(context),
-                            SizedBox(height: 31.v),
-                            _buildMinimumTemperature3(context),
-                            SizedBox(height: 31.v),
-                            _buildMinimumTemperature4(context),
-                            SizedBox(height: 31.v),
-                            _buildMinimumTemperature5(context),
-                            SizedBox(height: 31.v),
-                            _buildMinimumTemperature6(context),
-                            SizedBox(
-                              height: 31.v,
-                            ),
-                            _buildMinimumTemperature7(context),
-                            SizedBox(height: 31.v),
-                            _buildCalculate(context),
-                            SizedBox(height: 30.v),
-                            Row(
+          body:
+
+              //Text("Hi"),
+
+              FutureBuilder(
+                  future: _fetchWeatherData("Ibadan"),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                          width: double.maxFinite,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 30.h,
+                            vertical: 31.v,
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "${_weatherData?.coord.lat}, ${_weatherData?.coord.lon}",
-                                  style: theme.textTheme.headlineSmall,
+                                Text("Net Radiation",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildDegreesCounter(context),
+                                SizedBox(height: 31.v),
+                                Text("Soil Heat Flux",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature1(context),
+                                SizedBox(height: 31.v),
+                                // Text("Mean Air Temperature",
+                                //     style: theme.textTheme.headlineSmall),
+                                // _buildSolarRadiation(context),
+                                SizedBox(height: 31.v),
+                                Text("Wind Speed",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature2(context),
+                                SizedBox(height: 31.v),
+                                Text("Saturation Vapor Pressure",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature3(context),
+                                SizedBox(height: 31.v),
+                                Text("Actual Vapor Pressure",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature4(context),
+                                SizedBox(height: 31.v),
+                                Text("Slope of Vapor Pressure Curve",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature5(context),
+                                SizedBox(height: 31.v),
+                                Text("Psychrometric Constant",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature6(context),
+                                SizedBox(
+                                  height: 31.v,
                                 ),
-                                CustomImageView(
-                                  imagePath: ImageConstant.imgPolygon4,
-                                  height: 29.v,
-                                  width: 30.h,
-                                  margin: EdgeInsets.only(left: 12.h),
+                                Text("Mean Air Temperature",
+                                    style: theme.textTheme.headlineSmall),
+                                _buildMinimumTemperature7(context),
+                                SizedBox(height: 31.v),
+                                _buildCalculate(context),
+                                SizedBox(height: 30.v),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "${weatherData?.coord!.lat}, ${weatherData?.coord!.lat}",
+                                      style: theme.textTheme.headlineSmall,
+                                    ),
+                                    CustomImageView(
+                                      imagePath: ImageConstant.imgPolygon4,
+                                      height: 29.v,
+                                      width: 30.h,
+                                      margin: EdgeInsets.only(left: 12.h),
+                                    ),
+                                  ],
                                 ),
+                                SizedBox(height: 10.v),
+                                Container(
+                                  width: 304.h,
+                                  margin: EdgeInsets.only(right: 64.h),
+                                  child: Text(
+                                    "Evaporation - %, Transpiration - 25%\n;ajknfprg ;erjklnpoer ;elrkjnneb ;wekjrbvjwer ;ekjrv",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.labelLarge,
+                                  ),
+                                ),
+                                SizedBox(height: 5.v),
                               ],
                             ),
-                            SizedBox(height: 10.v),
-                            Container(
-                              width: 304.h,
-                              margin: EdgeInsets.only(right: 64.h),
-                              child: Text(
-                                "Evaporation - %, Transpiration - 25%\n;ajknfprg ;erjklnpoer ;elrkjnneb ;wekjrbvjwer ;ekjrv",
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.labelLarge,
-                              ),
-                            ),
-                            SizedBox(height: 5.v),
-                          ],
-                        ),
-                      ));
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error fetching weather data'),
-                  );
-                } else if (snapshot.connectionState == ConnectionState.done) {
-                  return Text("Data fetched successfully");
-                }
-                return Container();
-              }),
+                          ));
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error fetching weather data'),
+                      );
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.done) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    return Container();
+                  }),
           bottomNavigationBar: _buildNinety(context),
         ),
       ),
@@ -362,17 +431,39 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
         //       2222.00,
         //  22222.00);
 
-        calculateEvapotranspiration(
+        var value = calculateEvapotranspiration(
             double.tryParse(netRadiationController.text),
             double.tryParse(soilHeatFluxController.text),
-            double.tryParse(meanAirTemperature.text),
+            double.tryParse(airTemperatureController.text),
             double.tryParse(windSpeedController.text),
             double.tryParse(saturationVaporPressureController.text),
             double.tryParse(actualVaporPressureController.text),
             double.tryParse(slopeOfVaporPressureCurveController.text),
             double.tryParse(psychrometricConstantController.text));
 
-        Navigator.pushNamed(context, AppRoutes.historyDetailsScreen);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: "Your Evapotranspiration is:",
+              content: "${value.toString()}",
+              positiveButtonText: "Yes",
+              negativeButtonText: "No",
+              onPositiveButtonPressed: () {
+                print("Yes");
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              onNegativeButtonPressed: () {
+                print("No");
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            );
+          },
+        );
+
+        // Future.delayed(Duration(seconds: 5), () {
+        //  Navigator.pushNamed(context, AppRoutes.historyDetailsScreen);
+        // });
       },
     );
   }
@@ -424,4 +515,12 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
       ),
     );
   }
+}
+
+convertToDegreeCelcius(double text) {
+  double kelvin = text;
+
+  double celsius = kelvin - 273.15;
+  // double celsius = (fahrenheit - 32) * (5 / 9);
+  return celsius;
 }
