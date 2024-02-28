@@ -42,7 +42,7 @@ class WeatherData {
       sys: json['sys'] != null ? Sys.fromJson(json['sys']) : null,
       timezone: json['timezone'],
       id: json['id'],
-      name: json['name'],
+      name: json['name'] ?? "",
       cod: json['cod'],
     );
   }

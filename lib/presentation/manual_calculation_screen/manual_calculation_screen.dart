@@ -50,6 +50,7 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
       print(weatherData.wind!.speed);
       print(weatherData.main!.humidity);
       print(weatherData.main!.pressure);
+      print(weatherData.name);
 
       // var temperature =
       //     convertToDegreeCelcius(weatherData.main!.temp!);
@@ -62,6 +63,12 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
         print("Wind Speed: ${weatherData.wind!.speed}");
         print(
             "slopeOfVaporPressureCurve: ${slopeVapourPressureCurve(weatherData.main!.temp!)}");
+        print(
+            "meanAirTemperature: ${meanAirTemperatureCalculation(weatherData.main!.tempMax!, weatherData.main!.tempMin!)}");
+        print(
+            "actualVaporPressure: ${actualVaporPressure(weatherData.main!.temp!, weatherData.main!.humidity!)}");
+        print(
+            "saturationVaporPressure: ${saturationVaporPressure(weatherData.main!.temp!)}");
 
         // Set text controller values
 
@@ -78,7 +85,7 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
         slopeOfVaporPressureCurveController.text =
             slopeVapourPressureCurve(weatherData.main!.temp!).toString();
 
-        actualVaporPressureController.text = actualVapourPressure(
+        actualVaporPressureController.text = actualVaporPressure(
                 weatherData.main!.temp!, weatherData.main!.humidity!)
             .toString();
 
@@ -98,79 +105,111 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
     }
   }
 
-  calculateEvapotranspiration(
-    netRadiation, // MJ/m² day
-    soilHeatFlux, // MJ/m² day
-    meanAirTemperature, // °C
-    windSpeed, // m/s
-    saturationVaporPressure, // kPa
-    actualVaporPressure, // kPa
-    slopeVaporPressureCurve, // kPa/°C
-    psychrometricConstant,
-  ) {
-    double vaporPressureDeficit = saturationVaporPressure - actualVaporPressure;
+  double calculateEvapotranspiration({
+    required double netRadiation,
+    required double soilHeatFlux,
+    required double meanAirTemperature,
+    required double windSpeed,
+    required double saturationVaporPressure,
+    required double actualVaporPressure,
+    required double psychrometricConstant,
+  }) {
+    // Convert temperature to Kelvin
+    final tempKelvin = meanAirTemperature - 273.15;
 
-    double numerator = slopeVaporPressureCurve * netRadiation +
-        psychrometricConstant * (vaporPressureDeficit * windSpeed);
+    // Slope of the saturation vapor pressure curve (kPa °C^-1)
+    final deltaSlope =
+        (4.098 * saturationVaporPressure) / (tempKelvin * tempKelvin);
 
-    double denominator = slopeVaporPressureCurve +
-        ((psychrometricConstant * 1.6) * vaporPressureDeficit);
+    // Calculate the vapor pressure deficit (kPa)
+    final vpd = saturationVaporPressure - actualVaporPressure;
 
-    // Calculate reference evapotranspiration
-    double eto = (numerator / denominator) *
-        ((0.408 *
-                saturationVaporPressure *
-                longwaveRadiation(meanAirTemperature) +
-            netRadiation +
-            soilHeatFlux)) /
-        (psychrometricConstant * (1 + 0.34 * windSpeed));
+    // Combined term (MJ m^-2 day^-1)
+    final numerator = netRadiation -
+        soilHeatFlux +
+        (0.408 * deltaSlope * vpd * (windSpeed * windSpeed));
 
-    print("Eto: $eto");
+    // Denominator (kPa °C^-1)
+    final denominator =
+        psychrometricConstant * (tempKelvin - 273.15) * (1 + 0.34 * windSpeed);
 
-    return eto;
+    // Evapotranspiration (mm/day)
+    final et = numerator / denominator * 86400 / (2450 * 1000);
+
+    return et;
   }
+
+// // Example usage
+// void main() {
+//   final netRadiation = 10.0;  // MJ/m² day
+//   final soilHeatFlux = 0.0;   // MJ/m² day
+//   final meanAirTemperature = 28.88;  // °C
+//   final windSpeed = 1.6;      // m/s
+//   final saturationVaporPressure = 3.5;  // kPa
+//   final actualVaporPressure = 2.86;  // kPa
+//   final psychrometricConstant = 0.067;  // kPa °C^-1
+
+//   final et = calculateEvapotranspiration(
+//     netRadiation: netRadiation,
+//     soilHeatFlux: soilHeatFlux,
+//     meanAirTemperature: meanAirTemperature,
+//     windSpeed: windSpeed,
+//     saturationVaporPressure: saturationVaporPressure,
+//     actualVaporPressure: actualVaporPressure,
+//     psychrometricConstant: psychrometricConstant,
+//   );
+
+//   print('Evapotranspiration: ${et.toStringAsFixed(2)} mm/day');
+// }
 
   // Helper function for longwave radiation calculation
   double longwaveRadiation(double airTemperature) {
     return 4.903 * math.pow(10, -9) * math.pow(airTemperature + 273.15, 4);
   }
 
-  slopeVapourPressureCurve(double temperature) {
+  double slopeVapourPressureCurve(double temperature) {
     double temperatureCelsius = temperature - 273.15;
-    return 4098 *
+    double slope = 4098 *
         (0.6108 *
             exp((17.27 * temperatureCelsius) / (temperatureCelsius + 237.3))) /
         pow(temperature + 237.3, 2);
+    return slope;
   }
 
-  double actualVapourPressure(
-      double temperatureFahrenheit, int relativeHumidity) {
+  double actualVaporPressure(double temperature, int relativeHumidity) {
     // Convert temperature from Kelvin to Celsius
-    double temperatureCelsius = temperatureFahrenheit - 273.15;
+    double temperatureCelsius = temperature - 273.15;
 
-    return (0.6108 *
+    // Calculate actual vapor pressure using the formula
+    double vaporPressure = (0.6108 *
             exp((17.27 * temperatureCelsius) / (temperatureCelsius + 237.3))) *
         (relativeHumidity / 100);
+
+    return vaporPressure;
   }
 
-  double saturationVaporPressure(double temperatureFahrenheit) {
+  double saturationVaporPressure(double temperature) {
     // Convert temperature to Celsius
-    double temperatureCelsius = temperatureFahrenheit - 273.15;
+    double temperatureCelsius = temperature - 273.15;
 
-    return 0.6108 *
+    // Calculate saturation vapor pressure using the formula
+    double saturationPressure = 0.6108 *
         exp((17.27 * temperatureCelsius) / (temperatureCelsius + 237.3));
+
+    return saturationPressure;
   }
 
   double meanAirTemperatureCalculation(
-      double airTemperature, double meanTemperature) {
-    // double airTemperatures = double.parse(airTemperature);
-    // double meanTemperature = double.parse(meanAirTemperature.text);
+      double airTemperatureMax, double airTemperatureMin) {
+    // Convert temperatures from Kelvin to Celsius
+    double airTemperatureMaxCelsius = airTemperatureMax - 273.15;
+    double airTemperatureMinCelsius = airTemperatureMin - 273.15;
 
-    // Convert temperatures to Celsius
-    double airTemperatureCelsius = airTemperature - 273.15;
-    double meanTemperatureCelsius = meanTemperature - 273.15;
+    // Calculate the mean air temperature
+    double meanTemperature =
+        (airTemperatureMaxCelsius + airTemperatureMinCelsius) / 2;
 
-    return (airTemperatureCelsius + meanTemperatureCelsius) / 2;
+    return meanTemperature;
   }
 
   // netRadiationCalculation() {
@@ -180,9 +219,9 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
   @override
   void initState() {
     super.initState();
-    print("Latitude: ${weatherData?.coord!.lat}");
-    //  print("Latitude: ${weatherData.lat}");
-    _fetchWeatherData("ibadan");
+    // print("Latitude: ${weatherData?.coord!.lat}");
+    // //  print("Latitude: ${weatherData.lat}");
+    // _fetchWeatherData("ibadan");
     // print('Latitude: ${_weatherData?.main.tempMax}');
   }
 
@@ -214,6 +253,9 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Text(
+                                  "You are currently at ${weatherData?.name} with the following data",
+                                ),
                                 Text("Net Radiation",
                                     style: theme.textTheme.headlineSmall),
                                 _buildDegreesCounter(context),
@@ -431,22 +473,42 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
         //       2222.00,
         //  22222.00);
 
-        var value = calculateEvapotranspiration(
-            double.tryParse(netRadiationController.text),
-            double.tryParse(soilHeatFluxController.text),
-            double.tryParse(airTemperatureController.text),
-            double.tryParse(windSpeedController.text),
-            double.tryParse(saturationVaporPressureController.text),
-            double.tryParse(actualVaporPressureController.text),
-            double.tryParse(slopeOfVaporPressureCurveController.text),
-            double.tryParse(psychrometricConstantController.text));
+        //       final netRadiation = 10.0;  // MJ/m² day
+        // final soilHeatFlux = 0.0;   // MJ/m² day
+        // final meanAirTemperature = 28.88;  // °C
+        // final windSpeed = 1.6;      // m/s
+        // final saturationVaporPressure = 3.5;  // kPa
+        // final actualVaporPressure = 2.86;  // kPa
+        // final psychrometricConstant = 0.067;  // kPa °C^-1
+
+        final et = calculateEvapotranspiration(
+          netRadiation: double.parse(netRadiationController.text),
+          soilHeatFlux: double.parse(soilHeatFluxController.text),
+          meanAirTemperature: double.parse(meanAirTemperature.text),
+          windSpeed: double.parse(windSpeedController.text),
+          saturationVaporPressure:
+              double.parse(saturationVaporPressureController.text),
+          actualVaporPressure: double.parse(actualVaporPressureController.text),
+          psychrometricConstant:
+              double.parse(psychrometricConstantController.text),
+        );
+
+        print('Evapotranspiration: ${et.toStringAsFixed(2)} mm/day');
+        // double.tryParse(netRadiationController.text),
+        // double.tryParse(soilHeatFluxController.text),
+        // double.tryParse(airTemperatureController.text),
+        // double.tryParse(windSpeedController.text),
+        // double.tryParse(saturationVaporPressureController.text),
+        // double.tryParse(actualVaporPressureController.text),
+        // double.tryParse(slopeOfVaporPressureCurveController.text),
+        // double.tryParse(psychrometricConstantController.text));
 
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: "Your Evapotranspiration is:",
-              content: "${value.toString()}",
+              content: "${et.toStringAsFixed(2)}mm/day",
               positiveButtonText: "Yes",
               negativeButtonText: "No",
               onPositiveButtonPressed: () {
