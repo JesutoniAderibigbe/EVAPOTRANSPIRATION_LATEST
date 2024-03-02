@@ -105,39 +105,40 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
     }
   }
 
-  double calculateEvapotranspiration({
-    required double netRadiation,
-    required double soilHeatFlux,
-    required double meanAirTemperature,
-    required double windSpeed,
-    required double saturationVaporPressure,
-    required double actualVaporPressure,
-    required double psychrometricConstant,
-  }) {
-    // Convert temperature to Kelvin
-    final tempKelvin = meanAirTemperature - 273.15;
+ double calculateEvapotranspiration({
+  required double netRadiation,
+  required double soilHeatFlux,
+  required double meanAirTemperature,
+  required double windSpeed,
+  required double saturationVaporPressure,
+  required double actualVaporPressure,
+  required double psychrometricConstant,
+}) {
+  // Convert temperature to Kelvin
+  final tempKelvin = meanAirTemperature + 273.15;
 
-    // Slope of the saturation vapor pressure curve (kPa °C^-1)
-    final deltaSlope =
-        (4.098 * saturationVaporPressure) / (tempKelvin * tempKelvin);
+  // Slope of the saturation vapor pressure curve (kPa °C^-1)
+  final deltaSlope =
+      (4098 * saturationVaporPressure) / (tempKelvin * tempKelvin);
 
-    // Calculate the vapor pressure deficit (kPa)
-    final vpd = saturationVaporPressure - actualVaporPressure;
+  // Calculate the vapor pressure deficit (kPa)
+  final vpd = saturationVaporPressure - actualVaporPressure;
 
-    // Combined term (MJ m^-2 day^-1)
-    final numerator = netRadiation -
-        soilHeatFlux +
-        (0.408 * deltaSlope * vpd * (windSpeed * windSpeed));
+  // Combined term (MJ m^-2 day^-1)
+  final numerator = netRadiation -
+      soilHeatFlux +
+      (0.408 * deltaSlope * vpd * (windSpeed * windSpeed));
 
-    // Denominator (kPa °C^-1)
-    final denominator =
-        psychrometricConstant * (tempKelvin - 273.15) * (1 + 0.34 * windSpeed);
+  // Denominator (kPa °C^-1)
+  final denominator =
+      psychrometricConstant * (numerator / deltaSlope + 273.15) * (1 + 0.34 * windSpeed);
 
-    // Evapotranspiration (mm/day)
-    final et = numerator / denominator * 86400 / (2450 * 1000);
+  // Evapotranspiration (mm/day)
+  final et = numerator / denominator * 86400 / 2.45;
 
-    return et;
-  }
+  return et;
+}
+
 
 // // Example usage
 // void main() {
