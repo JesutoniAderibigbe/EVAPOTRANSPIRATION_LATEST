@@ -39,7 +39,7 @@ class OnboardingScreen extends StatelessWidget {
                 onPressed: () {
                  
                   Navigator.pushNamed(
-                      context, AppRoutes.manualCalculationScreen);
+                      context, AppRoutes.getapplocationScreen);
                 },
               ),
             ],

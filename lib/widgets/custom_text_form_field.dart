@@ -25,6 +25,7 @@ class CustomTextFormField extends StatelessWidget {
     this.borderDecoration,
     this.fillColor,
     this.filled = false,
+     this.onChanged,
     this.validator,
   }) : super(
           key: key,
@@ -52,6 +53,8 @@ class CustomTextFormField extends StatelessWidget {
   final Color? fillColor;
   final bool? filled;
   final FormFieldValidator<String>? validator;
+   final ValueChanged<String>? onChanged; 
+  
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +73,7 @@ class CustomTextFormField extends StatelessWidget {
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           controller: controller,
           focusNode: focusNode ?? FocusNode(),
+          onChanged: onChanged,
           autofocus: autofocus!,
           style: textStyle ?? CustomTextStyles.bodySmallBluegray900,
           obscureText: obscureText!,
@@ -92,6 +96,7 @@ class CustomTextFormField extends StatelessWidget {
         contentPadding: contentPadding ?? EdgeInsets.all(15.h),
         fillColor: fillColor,
         filled: filled,
+      
         border: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(5.h),
