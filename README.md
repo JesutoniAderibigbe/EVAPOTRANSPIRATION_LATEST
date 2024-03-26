@@ -54,6 +54,14 @@ After successful build, your application structure should look like this:
 
 Resolve the errors and warnings that are shown in the application.
 
+### Project Overview
+
+This project is a comprehensive weather application designed to calculate evapotranspiration based on data retrieved from the openweatherapi.org. Evapotranspiration is a crucial parameter in agricultural and environmental studies, representing the sum of evaporation and plant transpiration from the Earth's land surface to the atmosphere.
+
+The application fetches real-time weather data using the WeatherData object, which includes various meteorological parameters such as temperature, humidity, wind speed, and cloud cover. It leverages the geolocator package to access the precise latitude and longitude of the user's location, ensuring accurate data input for evapotranspiration calculations.
+
+Furthermore, the project provides a user-friendly interface for easy navigation and interaction, adhering to Figma design guidelines for better UI accuracy. With a structured application architecture and attention to code formatting and readability, developers can easily maintain and extend the functionality of the application.
+
 ### Support
 
 If you have any problems or questions, go to our Discord channel, where we will help you as quickly as possible: https://discord.com/invite/rFMnCG5MZ7
