@@ -15,6 +15,7 @@ class AskForLocationPage extends StatefulWidget {
 
 class _AskForLocationPageState extends State<AskForLocationPage> {
   final LocationService geoLocatorService = LocationService();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class _AskForLocationPageState extends State<AskForLocationPage> {
               try {
                 Center(child: CircularProgressIndicator.adaptive());
                 Position _currentPosition =
-                    await Geolocator.getCurrentPosition();
+                    await geoLocatorService.determinePosition();
                 print(_currentPosition.latitude);
                 locationProvider.updateLocation(
                     _currentPosition.latitude, _currentPosition.longitude);

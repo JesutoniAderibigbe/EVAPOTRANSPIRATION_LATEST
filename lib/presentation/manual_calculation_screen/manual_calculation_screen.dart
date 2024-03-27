@@ -42,9 +42,17 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
 
   WeatherData? weatherData;
 
+    late double width;
+
   @override
   void initState() {
     super.initState();
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        // Initialize width with the screen width
+        width = MediaQuery.of(context).size.width;
+      });
+    });
     final locationProvider =
         Provider.of<LocationProvider>(context, listen:false);
     print(locationProvider.latitude);
