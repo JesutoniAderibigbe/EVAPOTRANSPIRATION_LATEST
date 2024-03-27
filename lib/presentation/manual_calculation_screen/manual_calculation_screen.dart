@@ -90,7 +90,11 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
               Consumer<WeatherDataProvider>(
             builder: (context, weatherProvider, _) {
               if (weatherProvider.weatherData == null) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(
+                  
+                )
+                
+                );
               } else {
                 return GestureDetector(
                   onTap: () {

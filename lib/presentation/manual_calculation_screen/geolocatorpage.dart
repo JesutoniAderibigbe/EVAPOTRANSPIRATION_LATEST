@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:habib_s_application5/core/app_export.dart';
+import 'package:habib_s_application5/models/provider/api_provider.dart';
 import 'package:habib_s_application5/models/provider/location_provider.dart';
 import 'package:habib_s_application5/presentation/manual_calculation_screen/manual_calculation_screen.dart';
 import 'package:habib_s_application5/services/location/location.dart';
@@ -15,11 +16,11 @@ class AskForLocationPage extends StatefulWidget {
 
 class _AskForLocationPageState extends State<AskForLocationPage> {
   final LocationService geoLocatorService = LocationService();
-  
 
   @override
   Widget build(BuildContext context) {
     var locationProvider = Provider.of<LocationProvider>(context);
+    var weatherProvider = Provider.of<WeatherProvider>(context);
     return MaterialApp(
       home: Scaffold(
         body: Center(
@@ -41,7 +42,7 @@ class _AskForLocationPageState extends State<AskForLocationPage> {
                         style: theme.textTheme.bodySmall,
                       ),
                       content: Text(
-                          "Do you wish to continue to view other details from your location?"),
+                          "Do you wish to continue to view other details from your location?, ${weatherProvider.weatherData?.name}"),
                       actions: [
                         GestureDetector(
                           onTap: () {
