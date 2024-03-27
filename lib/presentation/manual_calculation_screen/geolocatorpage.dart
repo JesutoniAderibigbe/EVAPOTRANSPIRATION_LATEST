@@ -20,7 +20,7 @@ class _AskForLocationPageState extends State<AskForLocationPage> {
   @override
   Widget build(BuildContext context) {
     var locationProvider = Provider.of<LocationProvider>(context);
-    var weatherProvider = Provider.of<WeatherProvider>(context);
+  
     return MaterialApp(
       home: Scaffold(
         body: Center(
