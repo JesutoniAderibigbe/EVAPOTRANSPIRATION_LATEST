@@ -35,17 +35,7 @@ class CustomTextStyles {
 }
 
 extension on TextStyle {
-  TextStyle get montserrat {
-    return copyWith(
-      fontFamily: 'Montserrat',
-    );
-  }
 
-  TextStyle get montserratSubrayada {
-    return copyWith(
-      fontFamily: 'Montserrat Subrayada',
-    );
-  }
 
   TextStyle get poppins {
     return copyWith(

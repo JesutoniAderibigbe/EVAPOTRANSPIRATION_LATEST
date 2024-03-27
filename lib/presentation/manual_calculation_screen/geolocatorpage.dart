@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:habib_s_application5/core/app_export.dart';
+import 'package:habib_s_application5/models/provider/location_provider.dart';
 import 'package:habib_s_application5/presentation/manual_calculation_screen/manual_calculation_screen.dart';
 import 'package:habib_s_application5/services/location/location.dart';
-import 'package:habib_s_application5/theme/theme_helper.dart';
+import 'package:provider/provider.dart';
 
 class AskForLocationPage extends StatefulWidget {
   const AskForLocationPage({Key? key}) : super(key: key);
@@ -13,72 +14,55 @@ class AskForLocationPage extends StatefulWidget {
 }
 
 class _AskForLocationPageState extends State<AskForLocationPage> {
-  late Position _currentPosition;
   final LocationService geoLocatorService = LocationService();
 
   @override
   Widget build(BuildContext context) {
+    var locationProvider = Provider.of<LocationProvider>(context);
     return MaterialApp(
       home: Scaffold(
-      //  appBar: AppBar(),
         body: Center(
           child: ElevatedButton(
             onPressed: () async {
-             
-
               try {
-                //    await geoLocatorService.determinePosition();
-
-                bool isLocationServiceEnabled =
-                    await Geolocator.isLocationServiceEnabled();
-                print("Location Service Enabled: $isLocationServiceEnabled");
-
-                LocationPermission permission =
-                    await Geolocator.checkPermission();
-                print("Location Permission: $permission");
-
-                // Get current position
+                Center(child: CircularProgressIndicator.adaptive());
                 Position _currentPosition =
                     await Geolocator.getCurrentPosition();
-                print("Position: $_currentPosition");
-
+                print(_currentPosition.latitude);
+                locationProvider.updateLocation(
+                    _currentPosition.latitude, _currentPosition.longitude);
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return AlertDialog.adaptive(
+                    return AlertDialog(
                       title: Text(
-                          "Your exact location has the laitutide ${_currentPosition.latitude} and longitude ${_currentPosition.longitude}",
-                          style: theme.textTheme.labelSmall),
+                        "Your exact location has the latitude ${_currentPosition.latitude} and longitude ${_currentPosition.longitude}",
+                        style: theme.textTheme.bodySmall,
+                      ),
                       content: Text(
                           "Do you wish to continue to view other details from your location?"),
                       actions: [
                         GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          ManualCalculationScreen(latitude: _currentPosition.latitude, longitude: _currentPosition.longitude,)));
-                            },
-                            child: Text(
-                              "Yes",
-                              style: theme.textTheme.labelSmall,
-                            )),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => ManualCalculationScreen()));
+                          },
+                          child: Text("Yes"),
+                        ),
                         SizedBox(width: 31.v),
                         GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child:
-                                Text("No", style: theme.textTheme.labelSmall))
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("No"),
+                        )
                       ],
                     );
-
-                   
                   },
                 );
-
-                // Do something with _currentPosition here
               } catch (e) {
                 print("Error getting location: $e");
               }

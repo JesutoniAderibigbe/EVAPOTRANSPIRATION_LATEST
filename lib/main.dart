@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:habib_s_application5/services/location/location.dart';
+import 'package:habib_s_application5/models/provider/location_provider.dart';
+import 'package:habib_s_application5/models/provider/weather_data_provider.dart';
+import 'package:provider/provider.dart';
 import 'core/app_export.dart';
 import 'firebase_options.dart';
 
@@ -34,7 +35,17 @@ void main() async{
 
   ///Please update theme as per your need if required.
   ThemeHelper().changeTheme('primary');
-  runApp(MyApp());
+  runApp(  MultiProvider(
+      providers: [
+       ChangeNotifierProvider(
+          create: (_) => LocationProvider(), // Instantiate your LocationProvider
+        ),
+      ChangeNotifierProvider(
+          create: (_) => WeatherDataProvider(), // Instantiate your WeatherDataProvider
+        ),
+      ],
+      child: MyApp(), // Your main app widget goes here
+    ));
 }
 
 class MyApp extends StatelessWidget {
