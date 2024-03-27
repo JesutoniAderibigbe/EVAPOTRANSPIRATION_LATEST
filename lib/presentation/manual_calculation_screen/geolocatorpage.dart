@@ -42,7 +42,7 @@ class _AskForLocationPageState extends State<AskForLocationPage> {
                         style: theme.textTheme.bodySmall,
                       ),
                       content: Text(
-                          "Do you wish to continue to view other details from your location?, ${weatherProvider.weatherData?.name}"),
+                          "Do you wish to continue to view other details from your location?,"),
                       actions: [
                         GestureDetector(
                           onTap: () {
