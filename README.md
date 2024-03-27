@@ -42,6 +42,7 @@ After successful build, your application structure should look like this:
     ├── routes                      - It contains all the routes of the application
     └── theme                       - It contains app theme and decoration classes
     └── widgets                     - It contains all custom widget classes
+  
 ```
 ### How to format your code?
 
@@ -62,6 +63,4 @@ The application fetches real-time weather data using the WeatherData object, whi
 
 Furthermore, the project provides a user-friendly interface for easy navigation and interaction, adhering to Figma design guidelines for better UI accuracy. With a structured application architecture and attention to code formatting and readability, developers can easily maintain and extend the functionality of the application.
 
-### Support
 
-If you have any problems or questions, go to our Discord channel, where we will help you as quickly as possible: https://discord.com/invite/rFMnCG5MZ7
