@@ -60,8 +60,8 @@ void initState() {
     final locationProvider = Provider.of<LocationProvider>(context, listen: false);
     
     Provider.of<WeatherDataProvider>(context, listen: false).fetchWeatherDatas(
-      locationProvider.latitude,
-      locationProvider.longitude,
+  7.223456,
+    3.1234566,
       airTemperatureController,
       windSpeedController,
       psychrometricConstantController,
