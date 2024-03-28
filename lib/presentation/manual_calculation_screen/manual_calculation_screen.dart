@@ -44,24 +44,22 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
   late double width;
 
   @override
+  void initState() {
+    super.initState();
 
-void initState() {
-  super.initState();
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
 
-
-    final locationProvider = Provider.of<LocationProvider>(context, listen: false);
-    
     _fetchWeatherData();
-  
-}
+  }
 
+  void _fetchWeatherData() {
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
 
- void _fetchWeatherData() {
-    final locationProvider = Provider.of<LocationProvider>(context, listen: false);
-    
     Provider.of<WeatherDataProvider>(context, listen: false).fetchWeatherDatas(
-  7.223456,
-    3.1234566,
+     locationProvider.latitude,
+locationProvider.longitude,
       airTemperatureController,
       windSpeedController,
       psychrometricConstantController,
@@ -74,23 +72,20 @@ void initState() {
     );
   }
 
-
   @override
   void dispose() {
- netRadiationController.dispose();
-  soilHeatFluxController.dispose();
-  airTemperatureController.dispose();
-  windSpeedController.dispose();
-  saturationVaporPressureController.dispose();
-  actualVaporPressureController.dispose();
-  slopeOfVaporPressureCurveController.dispose();
-  psychrometricConstantController.dispose();
-  resultController.dispose();
-  meanAirTemperature.dispose();
+    netRadiationController.dispose();
+    soilHeatFluxController.dispose();
+    airTemperatureController.dispose();
+    windSpeedController.dispose();
+    saturationVaporPressureController.dispose();
+    actualVaporPressureController.dispose();
+    slopeOfVaporPressureCurveController.dispose();
+    psychrometricConstantController.dispose();
+    resultController.dispose();
+    meanAirTemperature.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -111,78 +106,7 @@ void initState() {
               Consumer<WeatherDataProvider>(
             builder: (context, weatherProvider, _) {
               if (weatherProvider.weatherData == null) {
-                 return GestureDetector(
-                  onTap: () {
-                    FocusScope.of(context).requestFocus();
-                  },
-                  child: Container(
-                    width: double.maxFinite,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 30.h,
-                      vertical: 31.v,
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 31.v),
-                          Text("Net Radiation",
-                              style: theme.textTheme.headlineSmall),
-                          _buildDegreesCounter(context),
-                          SizedBox(height: 31.v),
-                          Text("Soil Heat Flux",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature1(context),
-                          SizedBox(height: 31.v),
-                          Text("Wind Speed",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature2(context),
-                          SizedBox(height: 31.v),
-                          Text("Saturation Vapor Pressure",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature3(context),
-                          SizedBox(height: 31.v),
-                          Text("Actual Vapor Pressure",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature4(context),
-                          SizedBox(height: 31.v),
-                          Text("Slope of Vapor Pressure Curve",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature5(context),
-                          SizedBox(height: 31.v),
-                          Text("Psychrometric Constant",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature6(context),
-                          SizedBox(
-                            height: 31.v,
-                          ),
-                          Text("Mean Air Temperature",
-                              style: theme.textTheme.headlineSmall),
-                          _buildMinimumTemperature7(context),
-                          SizedBox(height: 31.v),
-                          _buildCalculate(context),
-                          SizedBox(height: 30.v),
-                          Row(
-                            children: [
-                              Text(
-                                "${locationProvider.latitude}, ${locationProvider.longitude}",
-                                style: theme.textTheme.headlineSmall,
-                              ),
-                              CustomImageView(
-                                imagePath: ImageConstant.imgPolygon4,
-                                height: 29.v,
-                                width: 30.h,
-                                margin: EdgeInsets.only(left: 12.h),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10.v),
-                          // Add any additional widgets or layout changes here
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+                return CircularProgressIndicator();
               } else if (weatherProvider.weatherData != null) {
                 return GestureDetector(
                   onTap: () {
