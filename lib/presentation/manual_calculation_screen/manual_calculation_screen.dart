@@ -111,7 +111,7 @@ void initState() {
               Consumer<WeatherDataProvider>(
             builder: (context, weatherProvider, _) {
               if (weatherProvider.weatherData == null) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: Text("No data available"));
               } else if (weatherProvider.weatherData != null) {
                 return GestureDetector(
                   onTap: () {
