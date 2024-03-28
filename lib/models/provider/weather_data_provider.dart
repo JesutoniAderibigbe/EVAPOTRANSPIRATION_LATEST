@@ -6,37 +6,49 @@ import 'package:habib_s_application5/data/weatherdata_class.dart';
 import 'package:habib_s_application5/models/weathermodel.dart';
 
 class WeatherDataProvider extends ChangeNotifier {
-
   WeatherData? _weatherData;
 
   WeatherData? get weatherData => _weatherData;
 
-  Future<void> fetchWeatherDatas(  double latitude,
-     double longitude,
-     TextEditingController airTemperatureController,
-     TextEditingController windSpeedController,
-     TextEditingController psychrometricConstantController,
-     TextEditingController slopeOfVaporPressureCurveController,
-     TextEditingController actualVaporPressureController,
-     TextEditingController saturationVaporPressureController,
-     TextEditingController soilHeatFluxController,
-     TextEditingController meanAirTemperature,
-     TextEditingController netRadiationController,) async {
+  Future<void> fetchWeatherDatas(
+    double latitude,
+    double longitude,
+    TextEditingController airTemperatureController,
+    TextEditingController windSpeedController,
+    TextEditingController psychrometricConstantController,
+    TextEditingController slopeOfVaporPressureCurveController,
+    TextEditingController actualVaporPressureController,
+    TextEditingController saturationVaporPressureController,
+    TextEditingController soilHeatFluxController,
+    TextEditingController meanAirTemperature,
+    TextEditingController netRadiationController,
+  ) async {
     try {
       _weatherData = await WeatherService.fetchWeatherData(latitude, longitude);
       notifyListeners();
       if (_weatherData != null) {
-      // Update the controllers with the fetched data
-      airTemperatureController.text = convertToDegreeCelcius(_weatherData!.main!.temp!).toString();
-      windSpeedController.text = _weatherData!.wind!.speed.toString();
-      psychrometricConstantController.text = '0.067';
-      slopeOfVaporPressureCurveController.text = slopeVapourPressureCurve(_weatherData!.main!.temp!).toStringAsFixed(2);
-      actualVaporPressureController.text = actualVaporPressure(_weatherData!.main!.temp!, _weatherData!.main!.humidity!).toStringAsFixed(2);
-      saturationVaporPressureController.text = saturationVaporPressure(_weatherData!.main!.temp!).toStringAsFixed(2);
-      soilHeatFluxController.text = '0';
-      meanAirTemperature.text = meanAirTemperatureCalculation(_weatherData!.main!.tempMax!, _weatherData!.main!.tempMin!).toString();
-      netRadiationController.text = "5";
-    }
+        // Update the controllers with the fetched data
+        airTemperatureController.text =
+            convertToDegreeCelcius(_weatherData!.main!.temp!).toString();
+        windSpeedController.text = _weatherData!.wind!.speed.toString();
+        psychrometricConstantController.text = '0.067';
+        slopeOfVaporPressureCurveController.text =
+            slopeVapourPressureCurve(_weatherData!.main!.temp!)
+                .toStringAsFixed(2);
+        actualVaporPressureController.text = actualVaporPressure(
+                _weatherData!.main!.temp!, _weatherData!.main!.humidity!)
+            .toStringAsFixed(2);
+        saturationVaporPressureController.text =
+            saturationVaporPressure(_weatherData!.main!.temp!)
+                .toStringAsFixed(2);
+        soilHeatFluxController.text = '0';
+        meanAirTemperature.text = meanAirTemperatureCalculation(
+                _weatherData!.main!.tempMax!, _weatherData!.main!.tempMin!)
+            .toString();
+        netRadiationController.text = "5";
+
+        notifyListeners();
+      }
     } catch (e) {
       print('Error fetching weather data: $e');
     }
