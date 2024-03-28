@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:habib_s_application5/core/app_export.dart';
 import 'package:habib_s_application5/models/provider/location_provider.dart';
@@ -42,22 +41,22 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
 
   WeatherData? weatherData;
 
-    late double width;
+  late double width;
 
   @override
   void initState() {
     super.initState();
-     WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         // Initialize width with the screen width
         width = MediaQuery.of(context).size.width;
       });
     });
     final locationProvider =
-        Provider.of<LocationProvider>(context, listen:false);
+        Provider.of<LocationProvider>(context, listen: false);
     print(locationProvider.latitude);
     Provider.of<WeatherDataProvider>(context, listen: false).fetchWeatherDatas(
-   locationProvider.latitude,
+      locationProvider.latitude,
       locationProvider.longitude,
       airTemperatureController,
       windSpeedController,
@@ -73,8 +72,8 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
 
   @override
   Widget build(BuildContext context) {
-     final locationProvider =
-        Provider.of<LocationProvider>(context, listen:false);
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -90,12 +89,8 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
               Consumer<WeatherDataProvider>(
             builder: (context, weatherProvider, _) {
               if (weatherProvider.weatherData == null) {
-                return Center(child: CircularProgressIndicator(
-                  
-                )
-                
-                );
-              } else {
+                return Center(child: CircularProgressIndicator());
+              } else if (weatherProvider.weatherData != null) {
                 return GestureDetector(
                   onTap: () {
                     FocusScope.of(context).requestFocus();
@@ -110,7 +105,6 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                         
                           SizedBox(height: 31.v),
                           Text("Net Radiation",
                               style: theme.textTheme.headlineSmall),
@@ -171,6 +165,7 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
                 );
                 // Your UI code using weatherProvider.weatherData
               }
+              return Text("Hi");
             },
           ),
         ),
@@ -224,7 +219,6 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
       hintText: "Soil Heat Flux",
     );
   }
-
 
   /// Section Widget
   Widget _buildMinimumTemperature2(BuildContext context) {
@@ -287,9 +281,6 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
       buttonStyle: CustomButtonStyles.fillPrimary,
       buttonTextStyle: CustomTextStyles.titleSmallMedium,
       onPressed: () {
-       
-       
-
         final et = weatherProvider.calculateEvapotranspiration(
           netRadiation: double.parse(netRadiationController.text),
           soilHeatFlux: double.parse(soilHeatFluxController.text),
@@ -302,10 +293,8 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
               double.parse(psychrometricConstantController.text),
         );
 
-   
-
         print('Evapotranspiration: ${et.toStringAsFixed(2)} mm/day');
-      
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -331,16 +320,11 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
                     child: Text("Ok", style: theme.textTheme.labelSmall))
               ],
             );
-
-          
           },
         );
-
-       
       },
     );
   }
-
 }
 
 convertToDegreeCelcius(double text) {
