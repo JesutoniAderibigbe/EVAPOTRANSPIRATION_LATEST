@@ -44,17 +44,21 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
   late double width;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        // Initialize width with the screen width
-        width = MediaQuery.of(context).size.width;
-      });
-    });
-    final locationProvider =
-        Provider.of<LocationProvider>(context, listen: false);
-    print(locationProvider.latitude);
+
+void initState() {
+  super.initState();
+
+
+    final locationProvider = Provider.of<LocationProvider>(context, listen: false);
+    
+    _fetchWeatherData();
+  
+}
+
+
+ void _fetchWeatherData() {
+    final locationProvider = Provider.of<LocationProvider>(context, listen: false);
+    
     Provider.of<WeatherDataProvider>(context, listen: false).fetchWeatherDatas(
       locationProvider.latitude,
       locationProvider.longitude,
@@ -69,6 +73,24 @@ class _ManualCalculationScreenState extends State<ManualCalculationScreen> {
       netRadiationController,
     );
   }
+
+
+  @override
+  void dispose() {
+ netRadiationController.dispose();
+  soilHeatFluxController.dispose();
+  airTemperatureController.dispose();
+  windSpeedController.dispose();
+  saturationVaporPressureController.dispose();
+  actualVaporPressureController.dispose();
+  slopeOfVaporPressureCurveController.dispose();
+  psychrometricConstantController.dispose();
+  resultController.dispose();
+  meanAirTemperature.dispose();
+    super.dispose();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
