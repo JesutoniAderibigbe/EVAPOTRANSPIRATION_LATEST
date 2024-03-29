@@ -122,7 +122,7 @@ locationProvider.longitude,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 31.v),
+                          SizedBox(height: 22.v),
                           Text("Net Radiation",
                               style: theme.textTheme.headlineSmall),
                           _buildDegreesCounter(context),
@@ -318,7 +318,7 @@ locationProvider.longitude,
             return AlertDialog.adaptive(
               title: Text("Your Evapotranspiration for your location",
                   style: theme.textTheme.labelSmall),
-              content: Text("${et.toStringAsFixed(2)}mm/day"),
+              content: Text("${et.toStringAsFixed(2)}mm/day", style: theme.textTheme.bodySmall,),
               actions: [
                 // GestureDetector(
                 //   onTap: () {

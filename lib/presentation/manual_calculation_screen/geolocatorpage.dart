@@ -42,7 +42,7 @@ class _AskForLocationPageState extends State<AskForLocationPage> {
                         style: theme.textTheme.bodySmall,
                       ),
                       content: Text(
-                          "Do you wish to continue to view other details from your location?,"),
+                          "Do you wish to continue to view other details from your location?,", style: theme.textTheme.bodySmall,),
                       actions: [
                         GestureDetector(
                           onTap: () {
@@ -52,14 +52,14 @@ class _AskForLocationPageState extends State<AskForLocationPage> {
                                 MaterialPageRoute(
                                     builder: (_) => ManualCalculationScreen()));
                           },
-                          child: Text("Yes"),
+                          child: Text("Yes", style: theme.textTheme.bodySmall,),
                         ),
                         SizedBox(width: 31.v),
                         GestureDetector(
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: Text("No"),
+                          child: Text("No", style: theme.textTheme.bodySmall,),
                         )
                       ],
                     );
